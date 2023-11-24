@@ -66,10 +66,15 @@ class OrderController extends Controller
     {
         $user = $request->user();
         $id_resto = $user->id_resto;
+        $cek_order = Order::where('id_meja', $request->id_meja)->where('id_resto', $id_resto)->latest()->first();
 
         DB::beginTransaction();
 
         try {
+            if($cek_order->status_order != 'closed'){
+                throw new \Exception('meja sedang ada pelanggan');
+            }
+
             $order = Order::create([
                 'no_transaksi' => $this->no_transaksi(),
                 'nilai_transaksi' => $request->total_semua,
